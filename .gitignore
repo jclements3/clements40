@@ -1,0 +1,24 @@
+# FreeCAD backups
+*.FCBak
+*.FCStd1
+
+# Large lever STL package (254 MB) -- exceeds GitHub 100 MB limit.
+# Use Git LFS if you want to version this, or keep it local only.
+*.stl
+*.STL
+
+# WSL/Windows Zone.Identifier alternate streams
+*:Zone.Identifier
+
+# In-progress browser downloads
+*.crdownload
+Unconfirmed*
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor
+*~
+.#*
+\#*\#

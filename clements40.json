@@ -1,0 +1,1311 @@
+{
+ "h": {
+  "n": "CLEMENTS40",
+  "d": "L&H Prelude-40 range lever harp (A1..E7), Eb tuning, harpcanada 3D levers"
+ },
+ "u": "mm",
+ "ref_source": "derived from ../clements47/clements47.json with bass shifted to x=0",
+ "sb": {
+  "length": 659.2,
+  "bass_dia": 380.0,
+  "treble_dia": 102.0,
+  "limacon": {
+   "a_over_b": 2.0,
+   "dia_over_b": 6.0
+  }
+ },
+ "tuning": {
+  "base": "Eb major",
+  "lever_semitones": 1
+ },
+ "strings": [
+  {
+   "n": 1,
+   "harp": "1E",
+   "sci": "E7",
+   "grommet": {
+    "x": 619.2,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 619.2,
+    "y": 0,
+    "z": 80.8
+   },
+   "on": {
+    "x": 619.2,
+    "y": 0,
+    "z": 76.3
+   },
+   "f_off": 2793.79,
+   "f_on": 2637,
+   "d": 0.64,
+   "cd": 0.64,
+   "wd": 0,
+   "T": 61.4,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Nylon",
+    "core": "Nylon",
+    "wrap": null
+   }
+  },
+  {
+   "n": 2,
+   "harp": "1D",
+   "sci": "D7",
+   "grommet": {
+    "x": 605.9,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 605.9,
+    "y": 0,
+    "z": 90.9
+   },
+   "on": {
+    "x": 605.9,
+    "y": 0,
+    "z": 85.8
+   },
+   "f_off": 2488.66,
+   "f_on": 2349,
+   "d": 0.64,
+   "cd": 0.64,
+   "wd": 0,
+   "T": 61.6,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Nylon",
+    "core": "Nylon",
+    "wrap": null
+   }
+  },
+  {
+   "n": 3,
+   "harp": "1C",
+   "sci": "C7",
+   "grommet": {
+    "x": 592.6,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 592.6,
+    "y": 0,
+    "z": 101
+   },
+   "on": {
+    "x": 592.6,
+    "y": 0,
+    "z": 95.3
+   },
+   "f_off": 2217.44,
+   "f_on": 2093,
+   "d": 0.64,
+   "cd": 0.64,
+   "wd": 0,
+   "T": 60.4,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Nylon",
+    "core": "Nylon",
+    "wrap": null
+   }
+  },
+  {
+   "n": 4,
+   "harp": "1B",
+   "sci": "B6",
+   "grommet": {
+    "x": 579.3,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 579.3,
+    "y": 0,
+    "z": 111.1
+   },
+   "on": {
+    "x": 579.3,
+    "y": 0,
+    "z": 104.9
+   },
+   "f_off": 2093.49,
+   "f_on": 1976,
+   "d": 0.64,
+   "cd": 0.64,
+   "wd": 0,
+   "T": 65.1,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Nylon",
+    "core": "Nylon",
+    "wrap": null
+   }
+  },
+  {
+   "n": 5,
+   "harp": "1A",
+   "sci": "A6",
+   "grommet": {
+    "x": 566.0,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 566.0,
+    "y": 0,
+    "z": 121.2
+   },
+   "on": {
+    "x": 566.0,
+    "y": 0,
+    "z": 114.4
+   },
+   "f_off": 1864.64,
+   "f_on": 1760,
+   "d": 0.64,
+   "cd": 0.64,
+   "wd": 0,
+   "T": 61.5,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Nylon",
+    "core": "Nylon",
+    "wrap": null
+   }
+  },
+  {
+   "n": 6,
+   "harp": "1G",
+   "sci": "G6",
+   "grommet": {
+    "x": 551.6,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 551.6,
+    "y": 0,
+    "z": 131.3
+   },
+   "on": {
+    "x": 551.6,
+    "y": 0,
+    "z": 123.9
+   },
+   "f_off": 1661.23,
+   "f_on": 1568,
+   "d": 0.71,
+   "cd": 0.71,
+   "wd": 0,
+   "T": 71.9,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Nylon",
+    "core": "Nylon",
+    "wrap": null
+   }
+  },
+  {
+   "n": 7,
+   "harp": "1F",
+   "sci": "F6",
+   "grommet": {
+    "x": 537.2,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 537.2,
+    "y": 0,
+    "z": 146.4
+   },
+   "on": {
+    "x": 537.2,
+    "y": 0,
+    "z": 138.2
+   },
+   "f_off": 1480.06,
+   "f_on": 1397,
+   "d": 0.71,
+   "cd": 0.71,
+   "wd": 0,
+   "T": 70.9,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Nylon",
+    "core": "Nylon",
+    "wrap": null
+   }
+  },
+  {
+   "n": 8,
+   "harp": "2E",
+   "sci": "E6",
+   "grommet": {
+    "x": 522.8,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 522.8,
+    "y": 0,
+    "z": 161.6
+   },
+   "on": {
+    "x": 522.8,
+    "y": 0,
+    "z": 152.5
+   },
+   "f_off": 1397.42,
+   "f_on": 1319,
+   "d": 0.71,
+   "cd": 0.71,
+   "wd": 0,
+   "T": 77,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 9,
+   "harp": "2D",
+   "sci": "D6",
+   "grommet": {
+    "x": 508.4,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 508.4,
+    "y": 0,
+    "z": 176.7
+   },
+   "on": {
+    "x": 508.4,
+    "y": 0,
+    "z": 166.8
+   },
+   "f_off": 1244.86,
+   "f_on": 1175,
+   "d": 0.76,
+   "cd": 0.76,
+   "wd": 0,
+   "T": 83.9,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 10,
+   "harp": "2C",
+   "sci": "C6",
+   "grommet": {
+    "x": 494.0,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 494.0,
+    "y": 0,
+    "z": 191.9
+   },
+   "on": {
+    "x": 494.0,
+    "y": 0,
+    "z": 181.1
+   },
+   "f_off": 1109.25,
+   "f_on": 1047,
+   "d": 0.81,
+   "cd": 0.81,
+   "wd": 0,
+   "T": 89.3,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 11,
+   "harp": "2B",
+   "sci": "B5",
+   "grommet": {
+    "x": 479.6,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 479.6,
+    "y": 0,
+    "z": 207
+   },
+   "on": {
+    "x": 479.6,
+    "y": 0,
+    "z": 195.4
+   },
+   "f_off": 1046.74,
+   "f_on": 988,
+   "d": 0.81,
+   "cd": 0.81,
+   "wd": 0,
+   "T": 92.6,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 12,
+   "harp": "2A",
+   "sci": "A5",
+   "grommet": {
+    "x": 465.2,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 465.2,
+    "y": 0,
+    "z": 222.2
+   },
+   "on": {
+    "x": 465.2,
+    "y": 0,
+    "z": 209.7
+   },
+   "f_off": 932.32,
+   "f_on": 880,
+   "d": 0.81,
+   "cd": 0.81,
+   "wd": 0,
+   "T": 84.7,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 13,
+   "harp": "2G",
+   "sci": "G5",
+   "grommet": {
+    "x": 450.8,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 450.8,
+    "y": 0,
+    "z": 237.3
+   },
+   "on": {
+    "x": 450.8,
+    "y": 0,
+    "z": 224
+   },
+   "f_off": 830.61,
+   "f_on": 784,
+   "d": 0.91,
+   "cd": 0.91,
+   "wd": 0,
+   "T": 97,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 14,
+   "harp": "2F",
+   "sci": "F5",
+   "grommet": {
+    "x": 436.4,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 436.4,
+    "y": 0,
+    "z": 262.6
+   },
+   "on": {
+    "x": 436.4,
+    "y": 0,
+    "z": 247.9
+   },
+   "f_off": 739.5,
+   "f_on": 698,
+   "d": 0.91,
+   "cd": 0.91,
+   "wd": 0,
+   "T": 94.3,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 15,
+   "harp": "3E",
+   "sci": "E5",
+   "grommet": {
+    "x": 421.0,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 421.0,
+    "y": 0,
+    "z": 277.7
+   },
+   "on": {
+    "x": 421.0,
+    "y": 0,
+    "z": 262.1
+   },
+   "f_off": 698.18,
+   "f_on": 659,
+   "d": 0.91,
+   "cd": 0.91,
+   "wd": 0,
+   "T": 94,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 16,
+   "harp": "3D",
+   "sci": "D5",
+   "grommet": {
+    "x": 405.6,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 405.6,
+    "y": 0,
+    "z": 303
+   },
+   "on": {
+    "x": 405.6,
+    "y": 0,
+    "z": 286
+   },
+   "f_off": 621.9,
+   "f_on": 587,
+   "d": 0.91,
+   "cd": 0.91,
+   "wd": 0,
+   "T": 88.8,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 17,
+   "harp": "3C",
+   "sci": "C5",
+   "grommet": {
+    "x": 390.2,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 390.2,
+    "y": 0,
+    "z": 328.2
+   },
+   "on": {
+    "x": 390.2,
+    "y": 0,
+    "z": 309.8
+   },
+   "f_off": 554.1,
+   "f_on": 523,
+   "d": 1.02,
+   "cd": 1.02,
+   "wd": 0,
+   "T": 102.1,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 18,
+   "harp": "3B",
+   "sci": "B4",
+   "grommet": {
+    "x": 374.8,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 374.8,
+    "y": 0,
+    "z": 353.5
+   },
+   "on": {
+    "x": 374.8,
+    "y": 0,
+    "z": 333.7
+   },
+   "f_off": 523.37,
+   "f_on": 494,
+   "d": 1.02,
+   "cd": 1.02,
+   "wd": 0,
+   "T": 105.5,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 19,
+   "harp": "3A",
+   "sci": "A4",
+   "grommet": {
+    "x": 359.4,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 359.4,
+    "y": 0,
+    "z": 383.8
+   },
+   "on": {
+    "x": 359.4,
+    "y": 0,
+    "z": 362.3
+   },
+   "f_off": 466.16,
+   "f_on": 440,
+   "d": 1.02,
+   "cd": 1.02,
+   "wd": 0,
+   "T": 98.7,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 20,
+   "harp": "3G",
+   "sci": "G4",
+   "grommet": {
+    "x": 344.0,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 344.0,
+    "y": 0,
+    "z": 414.1
+   },
+   "on": {
+    "x": 344.0,
+    "y": 0,
+    "z": 390.9
+   },
+   "f_off": 415.31,
+   "f_on": 392,
+   "d": 1.14,
+   "cd": 1.14,
+   "wd": 0,
+   "T": 115.4,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 21,
+   "harp": "3F",
+   "sci": "F4",
+   "grommet": {
+    "x": 328.6,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 328.6,
+    "y": 0,
+    "z": 449.4
+   },
+   "on": {
+    "x": 328.6,
+    "y": 0,
+    "z": 424.2
+   },
+   "f_off": 369.75,
+   "f_on": 349,
+   "d": 1.14,
+   "cd": 1.14,
+   "wd": 0,
+   "T": 107.9,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 22,
+   "harp": "4E",
+   "sci": "E4",
+   "grommet": {
+    "x": 312.2,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 312.2,
+    "y": 0,
+    "z": 484.8
+   },
+   "on": {
+    "x": 312.2,
+    "y": 0,
+    "z": 457.6
+   },
+   "f_off": 349.62,
+   "f_on": 330,
+   "d": 1.14,
+   "cd": 1.14,
+   "wd": 0,
+   "T": 111.8,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 23,
+   "harp": "4D",
+   "sci": "D4",
+   "grommet": {
+    "x": 295.8,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 295.8,
+    "y": 0,
+    "z": 525.2
+   },
+   "on": {
+    "x": 295.8,
+    "y": 0,
+    "z": 495.7
+   },
+   "f_off": 311.48,
+   "f_on": 294,
+   "d": 1.27,
+   "cd": 1.27,
+   "wd": 0,
+   "T": 128.6,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 24,
+   "harp": "4C",
+   "sci": "C4",
+   "grommet": {
+    "x": 279.4,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 279.4,
+    "y": 0,
+    "z": 570.6
+   },
+   "on": {
+    "x": 279.4,
+    "y": 0,
+    "z": 538.6
+   },
+   "f_off": 277.58,
+   "f_on": 262,
+   "d": 1.27,
+   "cd": 1.27,
+   "wd": 0,
+   "T": 120.5,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 25,
+   "harp": "4B",
+   "sci": "B3",
+   "grommet": {
+    "x": 263.0,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 263.0,
+    "y": 0,
+    "z": 621.1
+   },
+   "on": {
+    "x": 263.0,
+    "y": 0,
+    "z": 586.2
+   },
+   "f_off": 261.69,
+   "f_on": 247,
+   "d": 1.27,
+   "cd": 1.27,
+   "wd": 0,
+   "T": 127.2,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 26,
+   "harp": "4A",
+   "sci": "A3",
+   "grommet": {
+    "x": 246.6,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 246.6,
+    "y": 0,
+    "z": 666.6
+   },
+   "on": {
+    "x": 246.6,
+    "y": 0,
+    "z": 629.2
+   },
+   "f_off": 233.08,
+   "f_on": 220,
+   "d": 1.55,
+   "cd": 1.14,
+   "wd": 0.2,
+   "T": 156.1,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 27,
+   "harp": "4G",
+   "sci": "G3",
+   "grommet": {
+    "x": 230.2,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 230.2,
+    "y": 0,
+    "z": 732.2
+   },
+   "on": {
+    "x": 230.2,
+    "y": 0,
+    "z": 691.1
+   },
+   "f_off": 207.65,
+   "f_on": 196,
+   "d": 1.55,
+   "cd": 1.14,
+   "wd": 0.2,
+   "T": 149.5,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 28,
+   "harp": "4F",
+   "sci": "F3",
+   "grommet": {
+    "x": 213.8,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 213.8,
+    "y": 0,
+    "z": 792.8
+   },
+   "on": {
+    "x": 213.8,
+    "y": 0,
+    "z": 748.3
+   },
+   "f_off": 185.4,
+   "f_on": 175,
+   "d": 1.68,
+   "cd": 1.27,
+   "wd": 0.2,
+   "T": 164,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 29,
+   "harp": "5E",
+   "sci": "E3",
+   "grommet": {
+    "x": 196.4,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 196.4,
+    "y": 0,
+    "z": 863.5
+   },
+   "on": {
+    "x": 196.4,
+    "y": 0,
+    "z": 815
+   },
+   "f_off": 174.81,
+   "f_on": 165,
+   "d": 1.68,
+   "cd": 1.27,
+   "wd": 0.2,
+   "T": 173.3,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 30,
+   "harp": "5D",
+   "sci": "D3",
+   "grommet": {
+    "x": 179.0,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 179.0,
+    "y": 0,
+    "z": 924.1
+   },
+   "on": {
+    "x": 179.0,
+    "y": 0,
+    "z": 872.2
+   },
+   "f_off": 155.74,
+   "f_on": 147,
+   "d": 1.93,
+   "cd": 1.27,
+   "wd": 0.33,
+   "T": 202,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 31,
+   "harp": "5C",
+   "sci": "C3",
+   "grommet": {
+    "x": 161.1,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 161.1,
+    "y": 0,
+    "z": 989.8
+   },
+   "on": {
+    "x": 161.1,
+    "y": 0,
+    "z": 934.3
+   },
+   "f_off": 138.79,
+   "f_on": 131,
+   "d": 2.06,
+   "cd": 1.4,
+   "wd": 0.33,
+   "T": 210.3,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 32,
+   "harp": "5B",
+   "sci": "B2",
+   "grommet": {
+    "x": 143.2,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 143.2,
+    "y": 0,
+    "z": 1055.4
+   },
+   "on": {
+    "x": 143.2,
+    "y": 0,
+    "z": 996.2
+   },
+   "f_off": 130.31,
+   "f_on": 123,
+   "d": 2.06,
+   "cd": 1.4,
+   "wd": 0.33,
+   "T": 213.1,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 33,
+   "harp": "5A",
+   "sci": "A2",
+   "grommet": {
+    "x": 125.3,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 125.3,
+    "y": 0,
+    "z": 1110.9
+   },
+   "on": {
+    "x": 125.3,
+    "y": 0,
+    "z": 1048.6
+   },
+   "f_off": 116.54,
+   "f_on": 110,
+   "d": 2.18,
+   "cd": 1.52,
+   "wd": 0.33,
+   "T": 212.5,
+   "mat": {
+    "brand": "Sipario",
+    "product": "GutGold",
+    "core": "Gut",
+    "wrap": null
+   }
+  },
+  {
+   "n": 34,
+   "harp": "5G",
+   "sci": "G2",
+   "grommet": {
+    "x": 107.4,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 107.4,
+    "y": 0,
+    "z": 1186.7
+   },
+   "on": {
+    "x": 107.4,
+    "y": 0,
+    "z": 1120.1
+   },
+   "f_off": 103.83,
+   "f_on": 98,
+   "d": 2.34,
+   "cd": 1.52,
+   "wd": 0.41,
+   "T": 217,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Concert Bass Wire",
+    "core": "Steel",
+    "wrap": "Bronze"
+   }
+  },
+  {
+   "n": 35,
+   "harp": "5F",
+   "sci": "F2",
+   "grommet": {
+    "x": 89.5,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 89.5,
+    "y": 0,
+    "z": 1222
+   },
+   "on": {
+    "x": 89.5,
+    "y": 0,
+    "z": 1153.4
+   },
+   "f_off": 92.49,
+   "f_on": 87.3,
+   "d": 2.54,
+   "cd": 1.52,
+   "wd": 0.51,
+   "T": 212.4,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Concert Bass Wire",
+    "core": "Steel",
+    "wrap": "Bronze"
+   }
+  },
+  {
+   "n": 36,
+   "harp": "6E",
+   "sci": "E2",
+   "grommet": {
+    "x": 71.6,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 71.6,
+    "y": 0,
+    "z": 1242.2
+   },
+   "on": {
+    "x": 71.6,
+    "y": 0,
+    "z": 1172.5
+   },
+   "f_off": 87.3,
+   "f_on": 82.4,
+   "d": 2.64,
+   "cd": 1.52,
+   "wd": 0.56,
+   "T": 210,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Concert Bass Wire",
+    "core": "Steel",
+    "wrap": "Bronze"
+   }
+  },
+  {
+   "n": 37,
+   "harp": "6D",
+   "sci": "D2",
+   "grommet": {
+    "x": 53.7,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 53.7,
+    "y": 0,
+    "z": 1282.6
+   },
+   "on": {
+    "x": 53.7,
+    "y": 0,
+    "z": 1210.6
+   },
+   "f_off": 77.76,
+   "f_on": 73.4,
+   "d": 1.17,
+   "cd": 0.51,
+   "wd": 0.2,
+   "T": 217.2,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Concert Bass Wire",
+    "core": "Steel",
+    "wrap": "Bronze"
+   }
+  },
+  {
+   "n": 38,
+   "harp": "6C",
+   "sci": "C2",
+   "grommet": {
+    "x": 35.8,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 35.8,
+    "y": 0,
+    "z": 1318
+   },
+   "on": {
+    "x": 35.8,
+    "y": 0,
+    "z": 1244
+   },
+   "f_off": 69.29,
+   "f_on": 65.4,
+   "d": 1.27,
+   "cd": 0.51,
+   "wd": 0.25,
+   "T": 222.1,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Concert Bass Wire",
+    "core": "Steel",
+    "wrap": "Bronze"
+   }
+  },
+  {
+   "n": 39,
+   "harp": "6B",
+   "sci": "B1",
+   "grommet": {
+    "x": 17.9,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 17.9,
+    "y": 0,
+    "z": 1348.3
+   },
+   "on": {
+    "x": 17.9,
+    "y": 0,
+    "z": 1272.6
+   },
+   "f_off": 65.37,
+   "f_on": 61.7,
+   "d": 1.37,
+   "cd": 0.51,
+   "wd": 0.25,
+   "T": 226.3,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Concert Bass Wire",
+    "core": "Steel",
+    "wrap": "Bronze"
+   }
+  },
+  {
+   "n": 40,
+   "harp": "6A",
+   "sci": "A1",
+   "grommet": {
+    "x": 0.0,
+    "y": 0,
+    "z": 0
+   },
+   "off": {
+    "x": 0.0,
+    "y": 0,
+    "z": 1378.6
+   },
+   "on": {
+    "x": 0.0,
+    "y": 0,
+    "z": 1301.2
+   },
+   "f_off": 58.27,
+   "f_on": 55,
+   "d": 1.45,
+   "cd": 0.56,
+   "wd": 0.33,
+   "T": 236.7,
+   "mat": {
+    "brand": "Bow Brand",
+    "product": "Pedal Concert Bass Wire",
+    "core": "Steel",
+    "wrap": "Bronze"
+   }
+  }
+ ],
+ "total_tension_N": 5294.6,
+ "total_tension_lbs": 1190.3,
+ "stringing": {
+  "1-7": "Bow Brand Pedal Nylon",
+  "8-33": "Sipario GutGold (gut)",
+  "34-35": "Bow Brand Pedal Concert Bass Wire",
+  "36-40": "Bow Brand Pedal Concert Bass Wire"
+ }
+}
