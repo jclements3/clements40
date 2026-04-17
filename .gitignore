@@ -14,6 +14,11 @@
 *.crdownload
 Unconfirmed*
 
+# Scraped third-party site assets (may contain their own API keys -- see
+# GitHub secret-scanning alert on the initial commit). The parent HTML alone
+# has the info we care about; the _files/ sidecar is just CSS/JS/images.
+*_files/
+
 # Python
 __pycache__/
 *.pyc
