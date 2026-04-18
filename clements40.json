@@ -2080,5 +2080,234 @@
    }
   ],
   "note": "on.z = 0 at every string is the lever rail; off.z = L_on; grommet.z = L_on - L (soundboard height, negative below rail). build_clements40.py should loft limacons perpendicular to (tx, tz) at each station, with flat top in +normal direction and bulb in -normal, mirroring clements47's fix_soundbox.py."
+ },
+ "harp_3d": {
+  "units": "mm",
+  "neck_profile": {
+   "description": "Closed Bezier outline of each plywood plate in the X-Z plane. Four cubic segments + two corner segments. Traversed CCW.",
+   "segments": [
+    {
+     "name": "bass_arch",
+     "P0": {
+      "x": -62.5,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P1": {
+      "x": -50.802,
+      "y": 0.0,
+      "z": 102.339
+     },
+     "P2": {
+      "x": -50.802,
+      "y": 0.0,
+      "z": 102.339
+     },
+     "P3": {
+      "x": 213.8,
+      "y": 0.0,
+      "z": 71.987
+     }
+    },
+    {
+     "name": "treble_arch",
+     "P0": {
+      "x": 213.8,
+      "y": 0.0,
+      "z": 71.987
+     },
+     "P1": {
+      "x": 695.2,
+      "y": 0.0,
+      "z": 16.767
+     },
+     "P2": {
+      "x": 695.2,
+      "y": 0.0,
+      "z": 16.767
+     },
+     "P3": {
+      "x": 695.2,
+      "y": 0.0,
+      "z": -51.606
+     }
+    },
+    {
+     "name": "right_corner",
+     "P0": {
+      "x": 695.2,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P1": {
+      "x": 695.2,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P2": {
+      "x": 644.2,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P3": {
+      "x": 644.2,
+      "y": 0.0,
+      "z": -51.606
+     }
+    },
+    {
+     "name": "belly_treble",
+     "P0": {
+      "x": 644.2,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P1": {
+      "x": 644.2,
+      "y": 0.0,
+      "z": -20.916
+     },
+     "P2": {
+      "x": 546.6,
+      "y": 0.0,
+      "z": -26.606
+     },
+     "P3": {
+      "x": 246.6,
+      "y": 0.0,
+      "z": -26.606
+     }
+    },
+    {
+     "name": "belly_bass",
+     "P0": {
+      "x": 246.6,
+      "y": 0.0,
+      "z": -26.606
+     },
+     "P1": {
+      "x": 46.6,
+      "y": 0.0,
+      "z": -26.606
+     },
+     "P2": {
+      "x": -15.022,
+      "y": 0.0,
+      "z": -18.99
+     },
+     "P3": {
+      "x": -17.5,
+      "y": 0.0,
+      "z": -51.606
+     }
+    },
+    {
+     "name": "left_corner",
+     "P0": {
+      "x": -17.5,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P1": {
+      "x": -17.5,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P2": {
+      "x": -62.5,
+      "y": 0.0,
+      "z": -51.606
+     },
+     "P3": {
+      "x": -62.5,
+      "y": 0.0,
+      "z": -51.606
+     }
+    }
+   ],
+   "anchors": {
+    "P0": {
+     "x": -62.5,
+     "y": 0.0,
+     "z": -51.606
+    },
+    "M": {
+     "x": 213.8,
+     "y": 0.0,
+     "z": 71.987
+    },
+    "P5": {
+     "x": 695.2,
+     "y": 0.0,
+     "z": -51.606
+    },
+    "UB3": {
+     "x": 644.2,
+     "y": 0.0,
+     "z": -51.606
+    },
+    "UBM": {
+     "x": 246.6,
+     "y": 0.0,
+     "z": -26.606
+    },
+    "UB0": {
+     "x": -17.5,
+     "y": 0.0,
+     "z": -51.606
+    }
+   }
+  },
+  "plates": {
+   "thickness_mm": 10.0,
+   "gap_mm": 10.0,
+   "stack_y_mm": 30.0,
+   "y_centers_mm": [
+    -10.0,
+    10.0
+   ]
+  },
+  "column": {
+   "description": "30mm x 45mm arc board in the X-Z plane.",
+   "axis_x": -40.0,
+   "radial_thickness": 45.0,
+   "y_thickness": 30.0,
+   "inner_peak_x": -40.0,
+   "outer_left_x_top": -62.5,
+   "arc_R": 7826.9946020340485,
+   "arc_sag": 22.5,
+   "top_z": -51.606,
+   "bot_z": -1237.706,
+   "top_chord_y_half": 22.5
+  },
+  "base_plane": {
+   "z": -1237.706,
+   "description": "Horizontal floor plane where the soundbox is cut off."
+  },
+  "soundboard_bass_extension": {
+   "description": "Cubic Bezier from the column outer-base corner (vertical tangent) to the first string grommet at x=0 (matching slope of the 7-knot LSQ fit).",
+   "P0": {
+    "x": -62.5,
+    "y": 0.0,
+    "z": -1237.706
+   },
+   "P1": {
+    "x": -62.5,
+    "y": 0.0,
+    "z": -1215.048
+   },
+   "P2": {
+    "x": -54.044,
+    "y": 0.0,
+    "z": -1197.172
+   },
+   "P3": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": -1124.412
+   },
+   "handle_A_mm": 22.658788827310538,
+   "handle_B_mm": 90.63515530924215
+  }
  }
 }

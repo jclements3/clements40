@@ -14,14 +14,21 @@ Approach (mirrors clements47 fix_soundbox.py logic, applied to clements40):
     shows the tuning pin position.
 """
 import json
+import math
 from pathlib import Path
 
 import numpy as np
 from scipy.interpolate import LSQUnivariateSpline, UnivariateSpline
 
+import os as _os
 ROOT = Path("/home/clementsj/projects/clements40")
-SPEC_PATH = ROOT / "clements40.json"
-SVG_PATH  = ROOT / "Clements40.svg"
+# HARP_SPEC env var selects which JSON to render (default: clements40.json).
+# The SVG file is named from the spec stem with its first letter uppercased
+# (clements40.json -> Clements40.svg, erand47.json -> Erand47.svg).
+_SPEC_NAME = _os.environ.get("HARP_SPEC", "clements40.json")
+SPEC_PATH  = ROOT / _SPEC_NAME
+_stem      = Path(_SPEC_NAME).stem
+SVG_PATH   = ROOT / (_stem[:1].upper() + _stem[1:] + ".svg")
 
 PIN_DIA   = 7.0
 LEVER_DIA = 6.0
@@ -29,10 +36,10 @@ LEVER_DIA = 6.0
 # Soundboard extension connects to the neck-bottom horizontal this far past
 # string 1 (E7, treble). NECK_DROP is derived from this and the soundboard
 # slope so the tangent extension reaches the horizontal at exactly this x offset.
-SOUNDBOARD_CONNECT_INCHES = 1.0
+SOUNDBOARD_CONNECT_MM = 25.0
 
 # 7-knot LSQ cubic -- matches bezier_soundboard.py / sb_curve in clements40.json.
-N_TOTAL_KNOTS = 7
+N_TOTAL_KNOTS = 6
 
 # Alignment mode: "pins" = bridge pins horizontal, levers curved below
 #                "levers" = levers horizontal, bridge pins curved above
@@ -66,13 +73,34 @@ def main() -> None:
 
     # --- Treble tangent extension (string 1 = E7 side) of the soundBOARD ---
     # Derive NECK_DROP so the soundboard tangent hits the horizontal exactly
-    # SOUNDBOARD_CONNECT_INCHES past string 1.
+    # SOUNDBOARD_CONNECT_MM past string 1.
     x_treb = float(xs[-1])
     y_treb = float(cs(x_treb))
     slope_treb = float(cs.derivative()(x_treb))
-    dist_past_string1 = SOUNDBOARD_CONNECT_INCHES * 25.4
+    dist_past_string1 = SOUNDBOARD_CONNECT_MM
     NECK_DROP = y_treb + slope_treb * dist_past_string1
     x_tangent_hit = x_treb + dist_past_string1
+
+    # Sloped under-belly (Erard pedal harps): the belly follows the sharp-disc
+    # row with SHARP_WALL_BELOW mm of wood below each disc. Deep at the bass
+    # (column side) where sharp discs sit far below the natural rail, shallow
+    # at the treble end. NECK_DROP stays at the original treble-tangent value
+    # -- it continues to define the treble top corner TB3 and the soundboard-
+    # connect geometry. BELLY_BASS_SBY / BELLY_TREBLE_SBY are the under-belly
+    # anchor heights; they reduce to NECK_DROP on harps without a "sharp"
+    # field (e.g. clements40).
+    SHARP_WALL_BELOW = 15.0
+    sharp_strings = [s for s in strings if "sharp" in s]
+    if sharp_strings:
+        # sort bass-first by grommet.x to pick extremes
+        _bs = sorted(sharp_strings, key=lambda s: s["grommet"]["x"])
+        # -sharp.z because sharp.z is CAD (negative below rail); sby is positive below rail
+        BELLY_BASS_SBY    = max(NECK_DROP,
+                                -float(_bs[0]["sharp"]["z"])  + SHARP_WALL_BELOW)
+        BELLY_TREBLE_SBY  = max(NECK_DROP,
+                                -float(_bs[-1]["sharp"]["z"]) + SHARP_WALL_BELOW)
+    else:
+        BELLY_BASS_SBY = BELLY_TREBLE_SBY = NECK_DROP
     import math as _m
     angle_treb = _m.degrees(_m.atan(abs(slope_treb)))
 
@@ -81,7 +109,14 @@ def main() -> None:
     tlen_t = (1.0 + slope_treb * slope_treb) ** 0.5
     tx_t = 1.0 / tlen_t
     tz_t = slope_treb / tlen_t
-    b_treb = 102.0 / 6.0
+    # Pull the soundbox diameters from the spec so the soundback / base / bulge
+    # curves all use the same b_bass and b_treb (they diverge if these are
+    # hardcoded and the spec's diameter doesn't match, leaving visible gaps at
+    # the treble soundback->neck junction and the bass base->bulge junction).
+    _sb_cfg        = data.get("sb_curve") or {}
+    _bass_dia_cfg  = float(_sb_cfg.get("diameter_bass",   380.0))
+    _treb_dia_cfg  = float(_sb_cfg.get("diameter_treble", 102.0))
+    b_treb = _treb_dia_cfg / 6.0
     bx_treble = x_treb - 3.0 * b_treb * tz_t
     bz_treble = y_treb + 3.0 * b_treb * tx_t
     # Place the soundback's horizontal-hit point exactly 3*b_treble to the
@@ -92,7 +127,7 @@ def main() -> None:
     slope_bass = float(cs.derivative()(xs[0]))
     y_bass = float(cs(xs[0]))
     tlen_b = (1.0 + slope_bass * slope_bass) ** 0.5
-    b_bass = 380.0 / 6.0
+    b_bass = _bass_dia_cfg / 6.0
     bx_bass = xs[0] - 3.0 * b_bass * (slope_bass / tlen_b)
     bz_bass = y_bass + 3.0 * b_bass * (1.0 / tlen_b)
 
@@ -158,9 +193,9 @@ def main() -> None:
     COLUMN_OD = 45.0
     COLUMN_X  = -40.0
     _dx = COLUMN_OD / 2.0
-    _inner_peak_x = float(xs[0]) - 1.5 * 25.4
+    _inner_peak_x = float(xs[0]) - 40.0
     _sag_col      = COLUMN_X - (_inner_peak_x - _dx)
-    _col_top_sby  = NECK_DROP
+    _col_top_sby  = BELLY_BASS_SBY
     _col_bot_sby  = float(bz_bass)
     _chord_col    = _col_bot_sby - _col_top_sby
     _R_col        = (_chord_col * _chord_col) / (8.0 * _sag_col) + _sag_col / 2.0
@@ -177,31 +212,179 @@ def main() -> None:
     import math as _m2
     _x0 = float(xs[0])
     _a = 1.0 + _slope_bass * _slope_bass
-    _yrel0 = _y_bass - _col_center_y
-    _b = 2.0 * ((_x0 - _col_center_x_inner) + _slope_bass * (_yrel0 - _slope_bass * _x0))
-    _c = (_x0 - _col_center_x_inner) ** 2 + (_yrel0 - _slope_bass * _x0) ** 2 - _R_col ** 2
-    _disc = _b * _b - 4.0 * _a * _c
-    if _disc > 0:
-        _sqd = _m2.sqrt(_disc)
-        _x_hit_a = (-_b - _sqd) / (2.0 * _a)
-        _x_hit_b = (-_b + _sqd) / (2.0 * _a)
-        # Choose root with x closer to 0 (the bass end), i.e. the one within
-        # a few hundred mm of the soundboard's bass end.
-        _candidates = [x for x in (_x_hit_a, _x_hit_b)
-                       if abs(x - _x0) < 200.0 and x < _x0 + 5.0]
-        if _candidates:
-            _x_hit = _candidates[0] if abs(_candidates[0] - _x0) < abs(_candidates[-1] - _x0) else _candidates[-1]
-            _y_hit = _y_bass + _slope_bass * (_x_hit - _x0)
-            ext_pts = f"{X(_x_hit):.2f},{top_pad + _y_hit + y_offset:.2f} "
-        else:
-            ext_pts = ""
-    else:
-        ext_pts = ""
-    curve_pts = ext_pts + " ".join(f"{X(x):.2f},{top_pad + cs(x) + y_offset:.2f}"
-                                   for x in dense_x)
+    # Bass extension: the soundboard curve takes off from the column's outer-
+    # base corner with a vertical tangent, joining the fit's slope at x=0 for
+    # G1 continuity. Rendered as a cubic Bezier sampled into the same polyline.
+    _ba_A_x = COLUMN_X - _dx                      # col_left_x_top = -62.5
+    _ba_A_y = float(bz_bass)                      # col_bot_sby (base plane in sby)
+    _ba_B_y = _y_bass                             # cs at xs[0]
+    _tlen_ba = (1.0 + _slope_bass * _slope_bass) ** 0.5
+    # Handles scale with the vertical gap A->B so the curve shape stays
+    # consistent across harp sizes (clements40 ~95 mm gap, erand47 much bigger).
+    _ba_gap = max(_ba_A_y - _ba_B_y, 1.0)
+    _ba_hA  = _ba_gap * 0.20                      # short vertical-up handle at A
+    _ba_hB  = _ba_gap * 0.80                      # slope-match handle at B
+    _ba_P1 = (_ba_A_x, _ba_A_y - _ba_hA)          # vertical-up tangent at A
+    _ba_P2 = (_x0 - _ba_hB / _tlen_ba,
+              _ba_B_y - _ba_hB * _slope_bass / _tlen_ba)  # match fit's slope at B
+    _ba_pts = []
+    for _i in range(40):
+        _t = _i / 39.0
+        _u = 1.0 - _t
+        _px = (_u**3 * _ba_A_x + 3 * _u**2 * _t * _ba_P1[0]
+               + 3 * _u * _t**2 * _ba_P2[0] + _t**3 * _x0)
+        _py = (_u**3 * _ba_A_y + 3 * _u**2 * _t * _ba_P1[1]
+               + 3 * _u * _t**2 * _ba_P2[1] + _t**3 * _ba_B_y)
+        _ba_pts.append(f"{X(_px):.2f},{top_pad + _py + y_offset:.2f}")
+    # Soundboard curve: cubic Bezier spline with 4 anchors and G1 continuity.
+    # SBa  (base bass corner, vertical-up tangent)
+    # SBb  (internal, tangent = local LSQ slope)
+    # SBc  (internal, tangent = local LSQ slope)
+    # SBd  (treble neck corner, vertical-up tangent)
+    # -> 3 Bezier segments. Internal-anchor y-values, their tangent slopes,
+    # and 6 handle lengths (2 per segment) are co-optimized by scipy
+    # least_squares to minimize y-residual on the 47 grommets.
+    _sb_A_x, _sb_A_y = _ba_A_x, _ba_A_y               # SBa = bass base corner
+    _sb_D_x, _sb_D_y = float(x_tangent_hit), NECK_DROP # SBd = treble neck corner
+    _sb_B_x = _sb_A_x + (_sb_D_x - _sb_A_x) * (1.0 / 3.0)
+    _sb_C_x = _sb_A_x + (_sb_D_x - _sb_A_x) * (2.0 / 3.0)
+
+    _sb_xs = xs
+    _sb_ys = (Ls - L_ons)
+
+    def _bez_eval(A_x, A_y, P1, P2, D_x, D_y, ts):
+        u = 1.0 - ts
+        bx = (u**3 * A_x + 3*u**2*ts * P1[0]
+              + 3*u*ts**2 * P2[0] + ts**3 * D_x)
+        by = (u**3 * A_y + 3*u**2*ts * P1[1]
+              + 3*u*ts**2 * P2[1] + ts**3 * D_y)
+        return bx, by
+
+    def _seg_y_at_xs(A_x, A_y, P1, P2, D_x, D_y, xs_target):
+        """Return by(t) for each xg where bx(t)=xg. Assumes x-monotone."""
+        ts_dense = np.linspace(0.0, 1.0, 2001)
+        bx_d, by_d = _bez_eval(A_x, A_y, P1, P2, D_x, D_y, ts_dense)
+        order = np.argsort(bx_d)
+        return np.interp(np.asarray(xs_target, dtype=float),
+                         bx_d[order], by_d[order])
+
+    _seg1_mask = (_sb_xs >= _sb_A_x) & (_sb_xs <= _sb_B_x)
+    _seg2_mask = (_sb_xs >  _sb_B_x) & (_sb_xs <= _sb_C_x)
+    _seg3_mask = (_sb_xs >  _sb_C_x) & (_sb_xs <= _sb_D_x)
+
+    def _unit(tx, ty):
+        n = math.hypot(tx, ty)
+        return (tx / n, ty / n)
+
+    def _sb_residuals(params):
+        (B_y, C_y, mB, mC,
+         h1A, h1B, h2B, h2C, h3C, h3D) = params
+        # Tangent unit vectors at each anchor (direction of motion A -> D):
+        tA = (0.0, -1.0)                      # vertical UP at SBa
+        tB = _unit(1.0, mB)                   # along (+x, slope) at SBb
+        tC = _unit(1.0, mC)                   # along (+x, slope) at SBc
+        tD = (0.0, -1.0)                      # vertical UP at SBd
+        # Segment 1: SBa -> SBb
+        P1_1 = (_sb_A_x + h1A * tA[0], _sb_A_y + h1A * tA[1])
+        P2_1 = (_sb_B_x - h1B * tB[0], B_y    - h1B * tB[1])
+        # Segment 2: SBb -> SBc
+        P1_2 = (_sb_B_x + h2B * tB[0], B_y    + h2B * tB[1])
+        P2_2 = (_sb_C_x - h2C * tC[0], C_y    - h2C * tC[1])
+        # Segment 3: SBc -> SBd
+        P1_3 = (_sb_C_x + h3C * tC[0], C_y    + h3C * tC[1])
+        P2_3 = (_sb_D_x - h3D * tD[0], _sb_D_y - h3D * tD[1])
+
+        ys_pred = np.empty_like(_sb_ys, dtype=float)
+        if _seg1_mask.any():
+            ys_pred[_seg1_mask] = _seg_y_at_xs(
+                _sb_A_x, _sb_A_y, P1_1, P2_1, _sb_B_x, B_y,
+                _sb_xs[_seg1_mask])
+        if _seg2_mask.any():
+            ys_pred[_seg2_mask] = _seg_y_at_xs(
+                _sb_B_x, B_y, P1_2, P2_2, _sb_C_x, C_y,
+                _sb_xs[_seg2_mask])
+        if _seg3_mask.any():
+            ys_pred[_seg3_mask] = _seg_y_at_xs(
+                _sb_C_x, C_y, P1_3, P2_3, _sb_D_x, _sb_D_y,
+                _sb_xs[_seg3_mask])
+        return ys_pred - _sb_ys
+
+    # Initial guess: B_y, C_y from the LSQ fit; slopes from cs derivative;
+    # handles at 1/3 of each segment's x-span.
+    _csd = cs.derivative()
+    _sb_B_y0 = float(cs(_sb_B_x)) if xs[0] <= _sb_B_x <= xs[-1] else \
+               _sb_A_y + (_sb_D_y - _sb_A_y) / 3.0
+    _sb_C_y0 = float(cs(_sb_C_x)) if xs[0] <= _sb_C_x <= xs[-1] else \
+               _sb_A_y + (_sb_D_y - _sb_A_y) * 2 / 3.0
+    _mB0 = float(_csd(_sb_B_x)) if xs[0] <= _sb_B_x <= xs[-1] else \
+           (_sb_C_y0 - _sb_A_y) / (_sb_C_x - _sb_A_x)
+    _mC0 = float(_csd(_sb_C_x)) if xs[0] <= _sb_C_x <= xs[-1] else \
+           (_sb_D_y - _sb_B_y0) / (_sb_D_x - _sb_B_x)
+    _span1 = (_sb_B_x - _sb_A_x) / 3.0
+    _span2 = (_sb_C_x - _sb_B_x) / 3.0
+    _span3 = (_sb_D_x - _sb_C_x) / 3.0
+    _sb_p0 = np.array([_sb_B_y0, _sb_C_y0, _mB0, _mC0,
+                    _span1, _span1, _span2, _span2, _span3, _span3])
+    _y_lo = min(_sb_A_y, _sb_D_y) - 50.0
+    _y_hi = max(_sb_A_y, _sb_D_y) + 50.0
+    _lo = np.array([_y_lo, _y_lo, -20.0, -20.0,
+                    1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+    _hi = np.array([_y_hi, _y_hi,  20.0,  20.0,
+                    (_sb_B_x - _sb_A_x) * 1.5, (_sb_B_x - _sb_A_x) * 1.5,
+                    (_sb_C_x - _sb_B_x) * 1.5, (_sb_C_x - _sb_B_x) * 1.5,
+                    (_sb_D_x - _sb_C_x) * 1.5, (_sb_D_x - _sb_C_x) * 1.5])
+    try:
+        from scipy.optimize import least_squares
+        _res = least_squares(_sb_residuals, _sb_p0, bounds=(_lo, _hi))
+        (_sb_B_y, _sb_C_y, _sb_mB, _sb_mC,
+         _sb_h1A, _sb_h1B, _sb_h2B, _sb_h2C,
+         _sb_h3C, _sb_h3D) = [float(v) for v in _res.x]
+        _sb_rms = float(np.sqrt(np.mean(_res.fun * _res.fun)))
+        _sb_max = float(np.max(np.abs(_res.fun)))
+    except Exception as _e:
+        print(f"Soundboard LSQ fit failed ({_e}); falling back to initial guess")
+        (_sb_B_y, _sb_C_y, _sb_mB, _sb_mC,
+         _sb_h1A, _sb_h1B, _sb_h2B, _sb_h2C,
+         _sb_h3C, _sb_h3D) = (_sb_B_y0, _sb_C_y0, _mB0, _mC0,
+                              _span1, _span1, _span2, _span2, _span3, _span3)
+        _sb_rms = _sb_max = float('nan')
+    print(f"Soundboard 3-seg Bezier fit: "
+          f"SBb=({_sb_B_x:.0f},{_sb_B_y:.0f}) SBc=({_sb_C_x:.0f},{_sb_C_y:.0f})  "
+          f"h1A={_sb_h1A:.0f} h1B={_sb_h1B:.0f} h2B={_sb_h2B:.0f} h2C={_sb_h2C:.0f} "
+          f"h3C={_sb_h3C:.0f} h3D={_sb_h3D:.0f}  "
+          f"RMS {_sb_rms:.2f} mm  max {_sb_max:.2f} mm")
+
+    # Rebuild final control points from the solution.
+    # SBd1 override: the LSQ fit pushes h3D to its floor (the grommets are
+    # nearly vertical there already), which makes the neck takeoff look kinked.
+    # Override to a fraction of segment 3's x-span so the curve eases into
+    # the vertical neck tangent more roundly. Trades some grommet fit near
+    # the treble for visual smoothness.
+    _sb_h3D_draw = (_sb_D_x - _sb_C_x) * 0.35
+    _tA = (0.0, -1.0)
+    _tB = _unit(1.0, _sb_mB)
+    _tC = _unit(1.0, _sb_mC)
+    _tD = (0.0, -1.0)
+    _sb_SBa1 = (_sb_A_x + _sb_h1A * _tA[0], _sb_A_y + _sb_h1A * _tA[1])
+    _sb_SBb1 = (_sb_B_x - _sb_h1B * _tB[0], _sb_B_y - _sb_h1B * _tB[1])
+    _sb_SBb2 = (_sb_B_x + _sb_h2B * _tB[0], _sb_B_y + _sb_h2B * _tB[1])
+    _sb_SBc1 = (_sb_C_x - _sb_h2C * _tC[0], _sb_C_y - _sb_h2C * _tC[1])
+    _sb_SBc2 = (_sb_C_x + _sb_h3C * _tC[0], _sb_C_y + _sb_h3C * _tC[1])
+    _sb_SBd1 = (_sb_D_x - _sb_h3D_draw * _tD[0], _sb_D_y - _sb_h3D_draw * _tD[1])
+
     parts.append(
-        f'<polyline points="{curve_pts}" fill="none" stroke="#7a2a2a" '
-        f'stroke-width="0.8" stroke-dasharray="4,3"/>'
+        f'<path d="M {X(_sb_A_x):.2f},{top_pad + _sb_A_y + y_offset:.2f} '
+        f'C {X(_sb_SBa1[0]):.2f},{top_pad + _sb_SBa1[1] + y_offset:.2f} '
+        f'{X(_sb_SBb1[0]):.2f},{top_pad + _sb_SBb1[1] + y_offset:.2f} '
+        f'{X(_sb_B_x):.2f},{top_pad + _sb_B_y + y_offset:.2f} '
+        f'C {X(_sb_SBb2[0]):.2f},{top_pad + _sb_SBb2[1] + y_offset:.2f} '
+        f'{X(_sb_SBc1[0]):.2f},{top_pad + _sb_SBc1[1] + y_offset:.2f} '
+        f'{X(_sb_C_x):.2f},{top_pad + _sb_C_y + y_offset:.2f} '
+        f'C {X(_sb_SBc2[0]):.2f},{top_pad + _sb_SBc2[1] + y_offset:.2f} '
+        f'{X(_sb_SBd1[0]):.2f},{top_pad + _sb_SBd1[1] + y_offset:.2f} '
+        f'{X(_sb_D_x):.2f},{top_pad + _sb_D_y + y_offset:.2f}" '
+        f'fill="none" stroke="#7a2a2a" stroke-width="0.8" '
+        f'stroke-dasharray="4,3"/>'
     )
 
     # Bulge-point curve: offset 3b perpendicular to the local tangent, on the
@@ -221,47 +404,41 @@ def main() -> None:
     frac = s_cum / s_cum[-1]
     dense_dia = bass_dia + (treble_dia - bass_dia) * frac
     dense_b = dense_dia / 6.0
-    # Bulge offset: perpendicular to tangent, on the AWAY-from-strings side.
-    # In (x, SB_y) space with SB decreasing (dSB/dx < 0), the outward normal
-    # is (-tz, +tx) -- i.e. bulge sits at larger x and larger SB_y (deeper).
+    # Bulge offset (kept for station-dot placement below -- no longer rendered
+    # as a polyline since the soundback curve is now a single cubic Bezier).
     bulge_x = dense_x - 3.0 * dense_b * tz
     bulge_z = cs(dense_x) + 3.0 * dense_b * tx
-    bulge_pts = " ".join(f"{X(x):.2f},{top_pad + z + y_offset:.2f}"
-                         for x, z in zip(bulge_x, bulge_z))
+
+    # Soundback curve: a SINGLE cubic Bezier from BKa (bass base corner at the
+    # bulge bass-bulb tip) to BKd (treble neck corner), both endpoints with
+    # vertical tangents. Shape controlled entirely by BKa1 and BKd1.
+    _bk_A_x, _bk_A_y = float(bx_bass), float(bz_bass)     # BKa
+    _bk_D_x, _bk_D_y = float(x_sbk_hit), NECK_DROP        # BKd
+    _bk_vspan = max(_bk_A_y - _bk_D_y, 1.0)
+    _bk_hA = _bk_vspan * 0.55                             # vertical handle at BKa
+    _bk_hD = _bk_vspan * 0.55                             # vertical handle at BKd
+    _bk_P1 = (_bk_A_x, _bk_A_y - _bk_hA)                  # BKa1
+    _bk_P2 = (_bk_D_x, _bk_D_y + _bk_hD)                  # BKd1
     parts.append(
-        f'<polyline points="{bulge_pts}" fill="none" stroke="#1a5" '
-        f'stroke-width="1.2"/>'
+        f'<path d="M {X(_bk_A_x):.2f},{top_pad + _bk_A_y + y_offset:.2f} '
+        f'C {X(_bk_P1[0]):.2f},{top_pad + _bk_P1[1] + y_offset:.2f} '
+        f'{X(_bk_P2[0]):.2f},{top_pad + _bk_P2[1] + y_offset:.2f} '
+        f'{X(_bk_D_x):.2f},{top_pad + _bk_D_y + y_offset:.2f}" '
+        f'fill="none" stroke="#1a5" stroke-width="1.2"/>'
+    )
+    parts.append(
+        f'<circle cx="{X(_bk_D_x):.2f}" cy="{top_pad + _bk_D_y + y_offset:.2f}" '
+        f'r="3" fill="#1a5"/>'
     )
 
-    # --- Soundback treble extension as a cubic Bezier: starts tangent to the
-    # soundback, arrives horizontally at SB_y=0. Solid to match the soundback.
-    yBk  = top_pad + bz_treble + y_offset
-    yHk  = top_pad + NECK_DROP + y_offset
-    h_bk = ((x_sbk_hit - bx_treble)**2 + (bz_treble - NECK_DROP)**2) ** 0.5 / 3.0
-    bk_p0x = X(bx_treble);   bk_p0y = yBk
-    bk_p3x = X(x_sbk_hit);   bk_p3y = yHk
-    bk_p1x = bk_p0x + h_bk * tx_t
-    bk_p1y = bk_p0y + h_bk * tz_t
-    # Vertical takeoff at P3 (straight up into the neck) -- P2 directly below P3.
-    bk_p2x = bk_p3x
-    bk_p2y = bk_p3y + h_bk
-    parts.append(
-        f'<path d="M {bk_p0x:.2f},{bk_p0y:.2f} '
-        f'C {bk_p1x:.2f},{bk_p1y:.2f} {bk_p2x:.2f},{bk_p2y:.2f} '
-        f'{bk_p3x:.2f},{bk_p3y:.2f}" fill="none" '
-        f'stroke="#1a5" stroke-width="1.2"/>'
-    )
-    parts.append(
-        f'<circle cx="{bk_p3x:.2f}" cy="{bk_p3y:.2f}" r="3" fill="#1a5"/>'
-    )
-
-    # --- Bass base as a cubic Bezier: starts tangent to the soundback (backward
-    # direction) at the bass end, arrives horizontally at the column. Smooth
-    # continuation of the soundback curve into a horizontal base toward the column.
+    # --- Bass base: horizontal at bz_bass from the soundback bass bulb to the
+    # column's outer-base corner (col_left_x_top = COLUMN_X - dx), so the base
+    # visually meets the column's foot rather than stopping short of it.
     COLUMN_X = -40.0
+    COLUMN_OD_HERE = 45.0
     base_y = top_pad + bz_bass + y_offset
-    base_p0x = X(bx_bass);    base_p0y = base_y
-    base_p3x = X(COLUMN_X);   base_p3y = base_y
+    base_p0x = X(bx_bass);                       base_p0y = base_y
+    base_p3x = X(COLUMN_X - COLUMN_OD_HERE/2.0); base_p3y = base_y
     # Both base-line control points horizontal: the base is a straight
     # horizontal segment from the soundback bass end to the column.
     h_base = (bx_bass - COLUMN_X) / 3.0
@@ -331,6 +508,17 @@ def main() -> None:
             f'<circle cx="{x + r_lever:.2f}" cy="{y_lever:.2f}" r="{r_lever:.2f}" '
             f'fill="#3050a0" stroke="#0b1a40" stroke-width="0.4"/>'
         )
+        # Sharp disc (Erard pedal harps have a second disc per string). Drawn
+        # only when the spec preserves a "sharp" field, as erand47.json does.
+        # sharp.z is the z offset from the natural-disc rail (negative => the
+        # sharp disc sits below the natural rail, closer to the grommet).
+        if "sharp" in s:
+            y_sharp = y_lever - float(s["sharp"]["z"])
+            parts.append(
+                f'<circle cx="{x + r_lever:.2f}" cy="{y_sharp:.2f}" '
+                f'r="{r_lever:.2f}" fill="#d06020" stroke="#5a2a00" '
+                f'stroke-width="0.4"/>'
+            )
 
     # --- Column: uniform 45 mm wide, bowed out to the left as a SIMPLE
     # CIRCULAR ARCH (not a spline or bezier). Both edges are arcs of the
@@ -339,11 +527,11 @@ def main() -> None:
     wall_above    = 10.0
     COLUMN_OD     = 45.0
     COLUMN_X      = -40.0
-    col_top_sby   = NECK_DROP
+    col_top_sby   = BELLY_BASS_SBY                     # column top tracks the belly at bass
     col_bot_sby   = float(bz_bass)
     dx            = COLUMN_OD / 2.0
-    INNER_PEAK_DIST_FROM_STR40_IN = 1.5
-    inner_peak_x   = float(xs[0]) - INNER_PEAK_DIST_FROM_STR40_IN * 25.4
+    INNER_PEAK_DIST_FROM_STR40_MM = 40.0
+    inner_peak_x   = float(xs[0]) - INNER_PEAK_DIST_FROM_STR40_MM
     # Axis apex x = inner peak - dx (inner edge is +dx from axis).
     axis_apex_x     = inner_peak_x - dx
     sag             = COLUMN_X - axis_apex_x       # how far left the axis bows
@@ -407,7 +595,8 @@ def main() -> None:
     # with extra clearance so the wood does not crack around the heavy bass
     # transition pins.
     prelude_string_at_M = 28                   # Prelude numbering: string 28 = 4F (F below middle C, same octave)
-    M_pin_idx = 40 - prelude_string_at_M       # sort-by-x index (bass-first) = 16
+    M_pin_idx = len(xs) - prelude_string_at_M  # sort-by-x index (bass-first)
+    M_pin_idx = max(0, min(len(xs) - 1, M_pin_idx))
     EXTRA_WALL_AT_M = 20.0                     # same extra mm above this pin as before
     arch_x_lo = float(xs[M_pin_idx])
     arch_y_lo = float(pin_arch_scale * sb_at_string[M_pin_idx] - wall - EXTRA_WALL_AT_M)
@@ -490,8 +679,8 @@ def main() -> None:
     # --- Under-belly of the neck: curve from the soundboard-connect point
     # (vertical takeoff) to the column inner top (tangent matches the
     # column's inner arc, going up out of the column). ---
-    UB3 = (float(x_tangent_hit), NECK_DROP)       # soundboard-connect point
-    UB0 = (COLUMN_X + dx, NECK_DROP)              # column inner top
+    UB3 = (float(x_tangent_hit), BELLY_TREBLE_SBY)   # soundboard-connect point (belly at treble)
+    UB0 = (COLUMN_X + dx,         BELLY_BASS_SBY)    # column inner top (belly at bass, deep)
 
     # Inner-arc tangent direction at the top, UP out of the column:
     # (at column top the inner-arc's tangent-line is nearly vertical; the
@@ -517,13 +706,30 @@ def main() -> None:
     h_ub_mid_L = 200.0
     h_ub_mid_R = 300.0
     UBM_string_num = 26                                # Prelude numbering
-    UBM_idx        = 40 - UBM_string_num               # sort-by-x index
-    UBM   = (float(xs[UBM_idx]), NECK_DROP - 25.4)     # 1" (25.4 mm) ABOVE the neck-bottom horizontal
+    UBM_idx        = len(xs) - UBM_string_num          # sort-by-x index (works for 40 or 47 strings)
+    UBM_idx        = max(0, min(len(xs) - 1, UBM_idx))
+    # UBM y: linearly interpolated between UB3 (treble belly) and UB0 (bass
+    # belly), then lifted 25 mm above the belly (same as clements40 did when
+    # the belly was horizontal). This keeps UBM on the sloped belly curve.
+    _ubm_x      = float(xs[UBM_idx])
+    _ubm_t      = (_ubm_x - UB3[0]) / (UB0[0] - UB3[0])
+    _ubm_belly  = UB3[1] + _ubm_t * (UB0[1] - UB3[1])
+    UBM         = (_ubm_x, _ubm_belly - 25.0)          # 25 mm ABOVE the sloped belly
     UBM_L = (UBM[0] - h_ub_mid_L, UBM[1])              # left-of-UBM handle (horizontal tangent)
     UBM_R = (UBM[0] + h_ub_mid_R, UBM[1])              # right-of-UBM handle (horizontal tangent)
     UB2 = (UB3[0], UB3[1] - h_ub_sbk)                   # UB3-side handle (vertical tangent UP)
-    UB1 = (UB0[0] + h_ub_col * inner_tan_up_x,          # UB0-side handle (inner-arc direction)
-           UB0[1] + h_ub_col * inner_tan_up_y)
+    # UB0-side handle. For a horizontal belly (clements40) the column's inner
+    # tangent (mostly vertical up) gives a smooth transition that then bulges
+    # toward UBM. For a sloped belly (Erard-style) a vertical-up handle rises
+    # the curve too quickly and the bass-most sharp discs end up outside the
+    # neck outline; a horizontal handle keeps the belly deep long enough to
+    # cover them before turning up toward UBM.
+    if sharp_strings:
+        _h_ub_col_x = 90.0                             # mm of horizontal extension
+        UB1 = (UB0[0] + _h_ub_col_x, UB0[1])           # horizontal tangent (belly stays deep)
+    else:
+        UB1 = (UB0[0] + h_ub_col * inner_tan_up_x,     # inner-arc tangent (clements40 legacy)
+               UB0[1] + h_ub_col * inner_tan_up_y)
 
     # Corner Beziers replace the two L segments for a fully-Bezier closed path.
     # Handles are G1-continuous with the adjacent curves so the corners round
@@ -566,21 +772,21 @@ def main() -> None:
 
     # --- Bezier control polygon + labels (debug/tuning overlay) ---
     def ptXY(p): return (X(p[0]), top_pad + p[1] + y_offset)
+    # Neck labels use the soundboard style:
+    #   NT  = Neck Top   (arched top, 3 anchors NTa/NTb/NTc, 2 segments)
+    #   NB  = Neck Bottom (under belly, 3 anchors NBa/NBb/NBc, 2 segments)
     pts = {
-        "P0": arch_P0, "P1": arch_P1,
-        "P2": arch_P2, "M": arch_M, "P3": arch_P3,
-        "P4": arch_P4, "P5": arch_P5,
-        "UB3": UB3, "UB2": UB2,
-        "UBM_R": UBM_R, "UBM": UBM, "UBM_L": UBM_L,
-        "UB1": UB1, "UB0": UB0,
+        "NTa":  arch_P0, "NTa1": arch_P1,
+        "NTb1": arch_P2, "NTb":  arch_M, "NTb2": arch_P3,
+        "NTc1": arch_P4, "NTc":  arch_P5,
+        "NBc":  UB3,     "NBc1": UB2,
+        "NBb2": UBM_R,   "NBb":  UBM,    "NBb1": UBM_L,
+        "NBa1": UB1,     "NBa":  UB0,
     }
-    # Handle LINES (blue dashed) -- anchor → handle for each anchor point.
-    # Neck top: P0→P1, M→P2, M→P3, P5→P4
-    # Under belly: UB0→UB1, UB3→UB2, UBM→UBM_L, UBM→UBM_R
     handle_pairs = [
-        ("P0",  "P1"),  ("M",   "P2"),  ("M",   "P3"),  ("P5",  "P4"),
-        ("UB0", "UB1"), ("UB3", "UB2"),
-        ("UBM", "UBM_L"), ("UBM", "UBM_R"),
+        ("NTa", "NTa1"), ("NTb", "NTb1"), ("NTb", "NTb2"), ("NTc", "NTc1"),
+        ("NBa", "NBa1"), ("NBc", "NBc1"),
+        ("NBb", "NBb1"), ("NBb", "NBb2"),
     ]
     for anchor, handle in handle_pairs:
         sa, sb = ptXY(pts[anchor]), ptXY(pts[handle])
@@ -588,9 +794,7 @@ def main() -> None:
             f'<line x1="{sa[0]:.2f}" y1="{sa[1]:.2f}" x2="{sb[0]:.2f}" y2="{sb[1]:.2f}" '
             f'stroke="#26c" stroke-width="0.8" stroke-dasharray="3,2"/>'
         )
-    # Control point markers + labels.
-    # Anchors (curve endpoints & joins) are RED solid; handles are BLUE dots.
-    anchor_names = {"P0", "M", "P5", "UB0", "UB3", "UBM"}
+    anchor_names = {"NTa", "NTb", "NTc", "NBa", "NBb", "NBc"}
     for name, p in pts.items():
         xp, yp = ptXY(p)
         is_anchor = name in anchor_names
@@ -599,19 +803,19 @@ def main() -> None:
         parts.append(
             f'<circle cx="{xp:.2f}" cy="{yp:.2f}" r="{r}" fill="{fill}"/>'
         )
-        if name in ("P0", "UB0"):
+        if name in ("NTa", "NBa"):
             lbl_dx, anc = 5, "start"
-        elif name == "P3":
+        elif name == "NTb2":
             lbl_dx, anc = -5, "end"
-        elif name == "M":
+        elif name == "NTb":
             lbl_dx, anc = 0, "middle"
         else:
             lbl_dx, anc = -5, "end"
-        if name == "M":
+        if name == "NTb":
             dy = -6
-        elif name == "P3":
+        elif name == "NTb2":
             dy = -6
-        elif name.startswith("UB"):
+        elif name.startswith("NB"):
             dy = 9
         else:
             dy = 3
@@ -619,7 +823,63 @@ def main() -> None:
         parts.append(
             f'<text x="{xp + lbl_dx:.2f}" y="{yp + dy:.2f}" '
             f'font-size="7" fill="{text_fill}" '
-            f'text-anchor="{anc}">{name} ({p[0]:.0f}, {p[1]:.0f})</text>'
+            f'text-anchor="{anc}">{name}</text>'
+        )
+
+    # --- Soundboard / Soundback Bezier control-point overlay -----------------
+    # Each curve is now a SINGLE cubic Bezier from outer bass anchor to outer
+    # treble anchor with vertical tangents at both endpoints. Two anchors +
+    # two handles per curve.
+    sbd_pts = {
+        "SBa":  (_sb_A_x, _sb_A_y), "SBa1": _sb_SBa1,
+        "SBb1": _sb_SBb1, "SBb": (_sb_B_x, _sb_B_y), "SBb2": _sb_SBb2,
+        "SBc1": _sb_SBc1, "SBc": (_sb_C_x, _sb_C_y), "SBc2": _sb_SBc2,
+        "SBd1": _sb_SBd1, "SBd":  (_sb_D_x, _sb_D_y),
+    }
+    sbk_pts = {
+        "BKa":  (_bk_A_x, _bk_A_y), "BKa1": _bk_P1,
+        "BKd1": _bk_P2,              "BKd":  (_bk_D_x, _bk_D_y),
+    }
+    sb_anchor_names = {"SBa", "SBb", "SBc", "SBd"}
+    bk_anchor_names = {"BKa", "BKd"}
+    sb_handle_pairs = [("SBa", "SBa1"),
+                       ("SBb", "SBb1"), ("SBb", "SBb2"),
+                       ("SBc", "SBc1"), ("SBc", "SBc2"),
+                       ("SBd", "SBd1")]
+    bk_handle_pairs = [("BKa", "BKa1"), ("BKd", "BKd1")]
+    # Handle lines (dashed, curve-color)
+    for anchor, handle in sb_handle_pairs:
+        sa, sh = ptXY(sbd_pts[anchor]), ptXY(sbd_pts[handle])
+        parts.append(
+            f'<line x1="{sa[0]:.2f}" y1="{sa[1]:.2f}" x2="{sh[0]:.2f}" y2="{sh[1]:.2f}" '
+            f'stroke="#c33" stroke-width="0.7" stroke-dasharray="3,2"/>'
+        )
+    for anchor, handle in bk_handle_pairs:
+        sa, sh = ptXY(sbk_pts[anchor]), ptXY(sbk_pts[handle])
+        parts.append(
+            f'<line x1="{sa[0]:.2f}" y1="{sa[1]:.2f}" x2="{sh[0]:.2f}" y2="{sh[1]:.2f}" '
+            f'stroke="#1a5" stroke-width="0.7" stroke-dasharray="3,2"/>'
+        )
+    # Points + labels. Anchors = filled solid dots, handles = small hollow-ish.
+    for name, p in sbd_pts.items():
+        xp, yp = ptXY(p)
+        is_anchor = name in sb_anchor_names
+        fill = "#a11" if is_anchor else "#e66"
+        r = 2.0 if is_anchor else 1.4
+        parts.append(f'<circle cx="{xp:.2f}" cy="{yp:.2f}" r="{r}" fill="{fill}"/>')
+        parts.append(
+            f'<text x="{xp + 4:.2f}" y="{yp - 3:.2f}" font-size="7" fill="#600">'
+            f'{name}</text>'
+        )
+    for name, p in sbk_pts.items():
+        xp, yp = ptXY(p)
+        is_anchor = name in bk_anchor_names
+        fill = "#063" if is_anchor else "#4b8"
+        r = 2.0 if is_anchor else 1.4
+        parts.append(f'<circle cx="{xp:.2f}" cy="{yp:.2f}" r="{r}" fill="{fill}"/>')
+        parts.append(
+            f'<text x="{xp + 4:.2f}" y="{yp + 9:.2f}" font-size="7" fill="#042">'
+            f'{name}</text>'
         )
 
     # Handle-length report below the title
@@ -634,7 +894,7 @@ def main() -> None:
         f'text-anchor="middle" font-size="11" fill="#3a2a10" '
         f'transform="rotate(-90 {X(apex_axis_x - dx):.2f} '
         f'{top_pad + sby_str40_center + y_offset:.2f})">'
-        f'COLUMN (45 mm, 1.5″ bow, uniform width)</text>'
+        f'COLUMN (45 mm wide, 40 mm bow, uniform width)</text>'
     )
 
     # Soundboard extension as a cubic Bezier that starts tangent to the
@@ -670,6 +930,69 @@ def main() -> None:
     parts.append('</svg>')
     SVG_PATH.write_text("\n".join(parts) + "\n")
     print(f"wrote {SVG_PATH}  ({w:.0f} x {h:.0f} mm, {len(strings)} strings)")
+
+    # --- Export the neck profile + column + soundbox extension in CAD coords
+    # (z_cad = -sby) for build_clements40.py. Writes into clements40.json under
+    # "harp_3d" without touching anything else.
+    def _c(p): return {"x": round(float(p[0]), 3), "y": 0.0,
+                        "z": round(-float(p[1]), 3)}
+    harp_3d = {
+        "units": "mm",
+        "neck_profile": {
+            "description": ("Closed Bezier outline of each plywood plate in "
+                            "the X-Z plane. Four cubic segments + two "
+                            "corner segments. Traversed CCW."),
+            "segments": [
+                {"name": "bass_arch",    "P0": _c(BB0),   "P1": _c(BB1),        "P2": _c(BB2),        "P3": _c(BB3)},
+                {"name": "treble_arch",  "P0": _c(BB3),   "P1": _c(M_OUT),      "P2": _c(TB2),        "P3": _c(TB3)},
+                {"name": "right_corner", "P0": _c(TB3),   "P1": _c(cornerR_h1), "P2": _c(cornerR_h2), "P3": _c(UB3)},
+                {"name": "belly_treble", "P0": _c(UB3),   "P1": _c(UB2),        "P2": _c(UBM_R),      "P3": _c(UBM)},
+                {"name": "belly_bass",   "P0": _c(UBM),   "P1": _c(UBM_L),      "P2": _c(UB1),        "P3": _c(UB0)},
+                {"name": "left_corner",  "P0": _c(UB0),   "P1": _c(cornerL_h1), "P2": _c(cornerL_h2), "P3": _c(BB0)},
+            ],
+            "anchors": {
+                "P0":  _c(BB0), "M":   _c(BB3), "P5":  _c(TB3),
+                "UB3": _c(UB3), "UBM": _c(UBM), "UB0": _c(UB0),
+            },
+        },
+        "plates": {
+            "thickness_mm": 10.0,
+            "gap_mm":       10.0,
+            "stack_y_mm":   30.0,
+            "y_centers_mm": [-10.0, 10.0],
+        },
+        "column": {
+            "description":         "30mm x 45mm arc board in the X-Z plane.",
+            "axis_x":              COLUMN_X,
+            "radial_thickness":    COLUMN_OD,          # 45 mm
+            "y_thickness":         30.0,
+            "inner_peak_x":        inner_peak_x,
+            "outer_left_x_top":    col_left_x_top,
+            "arc_R":               arc_R,
+            "arc_sag":             sag,
+            "top_z":               round(-col_top_sby, 3),
+            "bot_z":               round(-col_bot_sby, 3),
+            "top_chord_y_half":    COLUMN_OD / 2.0,
+        },
+        "base_plane": {
+            "z": round(-col_bot_sby, 3),
+            "description": "Horizontal floor plane where the soundbox is cut off.",
+        },
+        "soundboard_bass_extension": {
+            "description":    ("Cubic Bezier from the column outer-base corner "
+                               "(vertical tangent) to the first string grommet "
+                               "at x=0 (matching slope of the 7-knot LSQ fit)."),
+            "P0": _c((_ba_A_x, _ba_A_y)),
+            "P1": _c((_ba_P1[0], _ba_P1[1])),
+            "P2": _c((_ba_P2[0], _ba_P2[1])),
+            "P3": _c((_x0, _ba_B_y)),
+            "handle_A_mm":    _ba_hA,
+            "handle_B_mm":    _ba_hB,
+        },
+    }
+    data["harp_3d"] = harp_3d
+    SPEC_PATH.write_text(json.dumps(data, indent=1) + "\n")
+    print(f"wrote harp_3d geometry to {SPEC_PATH}")
 
 
 if __name__ == "__main__":
