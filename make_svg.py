@@ -427,7 +427,7 @@ def main() -> None:
 
     # Tilt the P2-P3 line (tangent at M): net 1° CCW.
     import math as _m3
-    tilt_deg = 2.0
+    tilt_deg = 4.0
     _c, _s = _m3.cos(_m3.radians(tilt_deg)), _m3.sin(_m3.radians(tilt_deg))
     _tx_new = arch_tx_lo * _c + arch_ty_lo * _s
     _ty_new = -arch_tx_lo * _s + arch_ty_lo * _c
@@ -436,10 +436,29 @@ def main() -> None:
     # Bridge control-handle lengths (tunable)
     h_col    = 180.0   # column-tangent handle (into bass bridge)
     h_M_L    = 303.75  # P2 handle length (bass side of M)
-    h_M_R    =  39.87  # P3 handle length (treble side of M)
+    h_M_R    = 398.70  # P3 handle length (treble side of M)
     h_TB0    = 200.0   # pin-arch-tangent handle approaching TB0 from M side
     h_arch_R =  35.0   # treble-side arch-tangent handle (leaving TB0 into treble bridge)
-    h_sbk    =  65.78  # soundback-vertical handle (P4)
+    h_sbk    =  59.20  # soundback-vertical handle (P4) -- overridden below
+
+    # Extend P3 and P4 so they meet at a common point. P4 is vertical above
+    # TB3 at x = neck_right_x, so the intersection sits at that x; P3's ray
+    # from M in direction (arch_tx_lo, arch_ty_lo) hits it at parameter t.
+    _t_isect = (neck_right_x - arch_x_lo) / arch_tx_lo
+    h_M_R = _t_isect
+    h_sbk = NECK_DROP - (arch_y_lo + _t_isect * arch_ty_lo)
+    print(f"P3/P4 intersection: h_M_R={h_M_R:.2f} mm, h_sbk={h_sbk:.2f} mm")
+
+    # Extend P1 and P2 so they meet at their intersection (solve the 2x2
+    # system where P1 leaves BB0 along col_tan_up and P2 leaves M along
+    # -arch_tan_lo).
+    _bb0x, _bb0y = col_left_x_top, col_top_sby
+    _den_12 = col_tan_up_x * arch_ty_lo - col_tan_up_y * arch_tx_lo
+    _dmx = arch_x_lo - _bb0x
+    _dmy = arch_y_lo - _bb0y
+    h_col = (_dmx * arch_ty_lo - _dmy * arch_tx_lo) / _den_12
+    h_M_L = (col_tan_up_x * _dmy - col_tan_up_y * _dmx) / _den_12
+    print(f"P1/P2 intersection: h_col={h_col:.2f} mm, h_M_L={h_M_L:.2f} mm")
 
     # Bass bridge BB0 -> BB3 (= M). Short symmetric handles P2 and P3 at M.
     BB0 = (col_left_x_top, col_top_sby)
@@ -506,16 +525,34 @@ def main() -> None:
     UB1 = (UB0[0] + h_ub_col * inner_tan_up_x,          # UB0-side handle (inner-arc direction)
            UB0[1] + h_ub_col * inner_tan_up_y)
 
+    # Corner Beziers replace the two L segments for a fully-Bezier closed path.
+    # Handles are G1-continuous with the adjacent curves so the corners round
+    # smoothly instead of making 90° turns.
+    CORNER_H = 0.0                                     # mm, corner-handle length (0 = sharp corners)
+    # Right corner TB3 -> UB3: both incoming (from P4 above) and outgoing
+    # (into UB2 above) tangents are vertical, so handles drop straight DOWN.
+    cornerR_h1 = (TB3[0], TB3[1] + CORNER_H)
+    cornerR_h2 = (UB3[0], UB3[1] + CORNER_H)
+    # Left corner UB0 -> BB0: G1 with UB1 (incoming at UB0) and BB1 (outgoing
+    # at BB0). At UB0 the tangent continues in direction UB0-UB1. At BB0 the
+    # tangent arrives in direction col_tan_up (same as BB0->BB1).
+    _ub_out_x = UB0[0] - UB1[0]
+    _ub_out_y = UB0[1] - UB1[1]
+    _ub_out_len = (_ub_out_x**2 + _ub_out_y**2) ** 0.5 or 1.0
+    cornerL_h1 = (UB0[0] + CORNER_H * _ub_out_x / _ub_out_len,
+                  UB0[1] + CORNER_H * _ub_out_y / _ub_out_len)
+    cornerL_h2 = (BB0[0] - CORNER_H * col_tan_up_x,
+                  BB0[1] - CORNER_H * col_tan_up_y)
+
     def ptA(p): return f"{X(p[0]):.2f},{top_pad + p[1] + y_offset:.2f}"
     neck_path = (
         f"M {ptA(BB0)} "
         f"C {ptA(BB1)} {ptA(BB2)} {ptA(BB3)} "           # bass bridge P0->P1->P2->M
-        f"C {ptA(M_OUT)} {ptA(TB0_IN)} {ptA(TB0)} "      # middle Bezier M->P3->TB0_IN->TB0
-        f"C {ptA(TB1)} {ptA(TB2)} {ptA(TB3)} "           # treble bridge TB0->TB1->TB2->P5
-        f"L {ptA(UB3)} "                                 # across from soundback-connect to soundboard-connect
+        f"C {ptA(M_OUT)} {ptA(TB2)} {ptA(TB3)} "         # single Bezier M->P3/P4->P5 (TB0 removed to avoid the dip)
+        f"C {ptA(cornerR_h1)} {ptA(cornerR_h2)} {ptA(UB3)} "   # right corner P5 -> UB3
         f"C {ptA(UB2)} {ptA(UBM_R)} {ptA(UBM)} "         # under-belly segment 1: UB3 -> UBM
         f"C {ptA(UBM_L)} {ptA(UB1)} {ptA(UB0)} "         # under-belly segment 2: UBM -> UB0
-        f"L {ptA((neck_left_x,  NECK_DROP))} Z"          # back across the column top to BB0
+        f"C {ptA(cornerL_h1)} {ptA(cornerL_h2)} {ptA(BB0)} Z"  # left corner UB0 -> BB0
     )
     parts.append(
         f'<path d="{neck_path}" fill="#c49a6c" fill-opacity="0.35" '
