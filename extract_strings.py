@@ -16,6 +16,12 @@ from pathlib import Path
 SRC = Path(__file__).resolve().parent.parent / "clements47" / "clements47.json"
 DST = Path(__file__).resolve().parent / "clements40.json"
 
+# Prelude 40 is 64" tall; the Erard concert pedal harp that clements47 models
+# is ~74" tall. Scale vertical (z) coordinates by this ratio so the inherited
+# string lengths match Prelude 40 proportions. X (string spacings) stays as-is
+# per design constraint; only the vertical frame shortens.
+Z_SCALE = 64.0 / 74.0
+
 # Prelude string number -> (harp code, clements47 note key)
 # String 1 = top (shortest, highest pitch), String 40 = bottom (longest, lowest)
 ORDER = [
@@ -45,7 +51,9 @@ def main():
     x_offset = src_strings["a1"]["o"]["x"]
 
     def shift(pt):
-        return {"x": round(pt["x"] - x_offset, 3), "y": pt.get("y", 0), "z": round(pt.get("z", 0), 3)}
+        return {"x": round(pt["x"] - x_offset, 3),
+                "y": pt.get("y", 0),
+                "z": round(pt.get("z", 0) * Z_SCALE, 3)}
 
     strings = []
     for n, (harp_code, note) in enumerate(ORDER, start=1):
